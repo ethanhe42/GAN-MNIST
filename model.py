@@ -41,23 +41,6 @@ class DCGAN():
         self.discrim_W4 = tf.Variable(tf.random_normal([5,5,dim_W2,dim_W1], stddev=0.02), name='dim_discrim_W4')
         self.discrim_W5 = tf.Variable(tf.random_normal([4*4*dim_W1,1], stddev=0.02), name='dim_discrim_W5')
 
-    def batchnormalize(self, X, eps=1e-8):
-        if X.get_shape().ndims == 4:
-            mean = tf.reduce_mean(X, [0,1,2])
-            std = tf.reduce_mean( tf.square(X-mean), [0,1,2] )
-            X = (X-mean) / std
-
-        elif X.get_shape().ndims == 2:
-            mean = tf.reduce_mean(X, 0)
-            std = tf.reduce_mean(tf.square(X-mean), 0)
-            X = (X-mean) / std
-
-        else:
-            raise NotImplementedError
-
-        return X
-
-
     def build_model(self):
 
         Z = tf.placeholder(tf.float32, [self.batch_size, self.dim_z])
