@@ -32,25 +32,25 @@ dcgan_model = DCGAN(
         dim_W5=dim_W5
         )
 
-Z_tf, image_tf, d_cost_tf, g_cost_tf = dcgan_model.build_model()
+Z_tf, image_tf, d_cost_tf, g_cost_tf, p_real, p_gen = dcgan_model.build_model()
 sess = tf.InteractiveSession()
 saver = tf.train.Saver(max_to_keep=10)
 
-adam_optimizer = tf.train.AdamOptimizer(learning_rate)
+discrim_vars = filter(lambda x: x.name.startswith('discrim'), tf.all_variables())
+gen_vars = filter(lambda x: x.name.startswith('gen'), tf.all_variables())
 
-grad_var_discrim = adam_optimizer.compute_gradients(d_cost_tf, dcgan_model.discrim_params)
-grad_var_gen = adam_optimizer.compute_gradients(d_cost_tf, dcgan_model.gen_params)
+train_op_discrim = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(d_cost_tf, var_list=discrim_vars)
+train_op_gen = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(g_cost_tf, var_list=gen_vars)
 
 Z_tf_sample, image_tf_sample = dcgan_model.samples_generator(batch_size=visualize_dim)
-
-train_op_discrim = adam_optimizer.apply_gradients(grad_var_discrim)
-train_op_gen = adam_optimizer.apply_gradients(grad_var_gen)
 
 tf.initialize_all_variables().run()
 
 Z_np_sample = np.random.uniform(-1, 1, size=(visualize_dim,dim_z))
 iterations = 0
+k = 5
 
+ipdb.set_trace()
 for epoch in range(n_epochs):
     np.random.shuffle(face_images)
 
@@ -61,30 +61,55 @@ for epoch in range(n_epochs):
 
         batch_image_files = face_images[start:end]
         batch_images = map(lambda x: crop_resize( os.path.join( face_image_path, x) ), batch_image_files)
-        batch_z = np.random.uniform(-1, 1, size=[batch_size, dim_z])
+        batch_images = np.array(batch_images).astype(np.float32)
+        batch_z = np.random.uniform(-1, 1, size=[batch_size, dim_z]).astype(np.float32)
 
-        if np.mod(iterations, 2) == 0:
-            _, gen_loss_val, discrim_loss_val = sess.run(
-                    [train_op_gen, g_cost_tf, d_cost_tf],
+#        last_genvar0 = sess.run(gen_vars)
+#        last_disvar0 = sess.run(discrim_vars)
+
+        if np.mod( iterations, k ) == 0:
+            _, gen_loss_val = sess.run(
+                    [train_op_gen, g_cost_tf],
                     feed_dict={
                         Z_tf:batch_z,
-                        image_tf:batch_images
                         })
+            discrim_loss_val, p_real_val, p_gen_val = sess.run([d_cost_tf,p_real,p_gen], feed_dict={Z_tf:batch_z, image_tf:batch_images})
+            print "=========== updating G =========="
+            print "iteration:", iterations
+            print "gen loss:", gen_loss_val
+            print "discrim loss:", discrim_loss_val
+
         else:
-            _, gen_loss_val, discrim_loss_val = sess.run(
-                    [train_op_discrim, g_cost_tf, d_cost_tf],
+            _, discrim_loss_val = sess.run(
+                    [train_op_discrim, d_cost_tf],
                     feed_dict={
                         Z_tf:batch_z,
                         image_tf:batch_images
                         })
+            gen_loss_val, p_real_val, p_gen_val = sess.run([g_cost_tf, p_real, p_gen], feed_dict={Z_tf:batch_z, image_tf:batch_images})
+            print "=========== updating D =========="
+            print "iteration:", iterations
+            print "gen loss:", gen_loss_val
+            print "discrim loss:", discrim_loss_val
+
+        print "Average P(real)=", p_real_val.mean()
+        print "Average P(gen)=", p_gen_val.mean()
+
+#        current_genvar0 = sess.run(gen_vars)
+#        current_disvar0 = sess.run(discrim_vars)
+#
+#        print "G change:", map(lambda (x,y): (y-x).sum(), zip(current_genvar0, last_genvar0))
+#        print "D change:", map(lambda (x,y): (y-x).sum(), zip(current_disvar0, last_disvar0))
+#        print "================================"
+
+        if np.mod(iterations, 10) == 0:
+            generated_samples = sess.run(
+                    image_tf_sample,
+                    feed_dict={
+                        Z_tf_sample:Z_np_sample
+                        })
+            generated_samples = (generated_samples + 1.)/2.
+            save_visualization(generated_samples, (14,14), save_path='./vis/sample_'+str(iterations/10)+'.jpg')
 
         iterations += 1
-
-    generated_samples = sess.run(
-            image_tf_sample,
-            feed_dict={
-                Z_tf_sample:Z_np_sample
-                })
-    generated_samples = (generated_samples + 1.)/2.
-    save_visualization(generated_samples, (14,14), save_path='./vis/sample_'+str(epoch)+'.jpg')
 
