@@ -4,7 +4,28 @@ import numpy as np
 import pandas as pd
 
 import ipdb
-from util import batchnormalize, lrelu
+
+def batchnormalize(X, eps=0e-8):
+    if X.get_shape().ndims == 4:
+        mean = tf.reduce_mean(X, [0,1,2])
+        std = tf.reduce_mean( tf.square(X-mean), [0,1,2] )
+        X = (X-mean) / std
+
+    elif X.get_shape().ndims == 2:
+        mean = tf.reduce_mean(X, 0)
+        std = tf.reduce_mean(tf.square(X-mean), 0)
+        X = (X-mean) / std
+
+    else:
+        raise NotImplementedError
+
+    return X
+
+def lrelu(X, leak=0.2):
+    f1 = 0.5 * (1 + leak)
+    f2 = 0.5 * (1 - leak)
+    return f1 * X + f2 * tf.abs(X)
+
 
 class DCGAN():
     def __init__(
@@ -41,16 +62,38 @@ class DCGAN():
         self.discrim_W4 = tf.Variable(tf.random_normal([5,5,dim_W2,dim_W1], stddev=0.02), name='dim_discrim_W4')
         self.discrim_W5 = tf.Variable(tf.random_normal([4*4*dim_W1,1], stddev=0.02), name='dim_discrim_W5')
 
+        self.gen_params = [
+                self.gen_W1,
+                self.gen_W2,
+                self.gen_W3,
+                self.gen_W4,
+                self.gen_W5
+                ]
+        self.discrim_params = [
+                self.discrim_W1,
+                self.discrim_W2,
+                self.discrim_W3,
+                self.discrim_W4,
+                self.discrim_W5
+                ]
+
     def build_model(self):
 
         Z = tf.placeholder(tf.float32, [self.batch_size, self.dim_z])
 
         image_real = tf.placeholder(tf.float32, [self.batch_size]+self.image_shape)
-        image_artificial = self.generate(Z)
+        image_gen = self.generate(Z)
 
         p_real = self.discriminate(image_real)
-        p_artificial = self.discriminate(image_artificial)
-        ipdb.set_trace()
+        p_gen = self.discriminate(image_gen)
+
+        discrim_cost_real = tf.nn.sigmoid_cross_entropy_with_logits( p_real, tf.ones_like(p_real) )
+        discrim_cost_gen = tf.nn.sigmoid_cross_entropy_with_logits( p_gen, tf.zeros_like(p_gen) )
+
+        discrim_cost = tf.reduce_mean(discrim_cost_real) + tf.reduce_mean(discrim_cost_gen)
+        gen_cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits( p_gen, tf.ones_like(p_gen) ))
+
+        return Z, image_real, discrim_cost, gen_cost
 
     def discriminate(self, image):
         h1 = lrelu( tf.nn.conv2d( image, self.discrim_W1, strides=[1,2,2,1], padding='SAME' ))
