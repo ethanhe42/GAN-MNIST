@@ -16,6 +16,8 @@ dim_W3 = 256
 dim_W4 = 128
 dim_W5 = 3
 
+visualize_dim=196
+
 face_image_path = '/media/storage3/Study/data/celeb/img_align_celeba'
 face_images = filter(lambda x: x.endswith('jpg'), os.listdir(face_image_path))
 
@@ -39,11 +41,14 @@ adam_optimizer = tf.train.AdamOptimizer(learning_rate)
 grad_var_discrim = adam_optimizer.compute_gradients(d_cost_tf, dcgan_model.discrim_params)
 grad_var_gen = adam_optimizer.compute_gradients(d_cost_tf, dcgan_model.gen_params)
 
+Z_tf_sample, image_tf_sample = dcgan_model.samples_generator(batch_size=visualize_dim)
+
 train_op_discrim = adam_optimizer.apply_gradients(grad_var_discrim)
 train_op_gen = adam_optimizer.apply_gradients(grad_var_gen)
 
 tf.initialize_all_variables().run()
 
+Z_np_sample = np.random.uniform(-1, 1, size=(visualize_dim,dim_z))
 iterations = 0
 
 for epoch in range(n_epochs):
@@ -75,5 +80,11 @@ for epoch in range(n_epochs):
 
         iterations += 1
 
-        ipdb.set_trace()
+    generated_samples = sess.run(
+            image_tf_sample,
+            feed_dict={
+                Z_tf_sample:Z_np_sample
+                })
+    generated_samples = (generated_samples + 1.)/2.
+    save_visualization(generated_samples, (14,14), save_path='./vis/sample_'+str(epoch)+'.jpg')
 
