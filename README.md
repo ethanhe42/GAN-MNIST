@@ -5,6 +5,14 @@
 
 ### Code
  * model.py
+  * Definition of DCGAN model
+ * train.py
+  * Training the DCGAN model using face data
  * util.py
+  * Image related utils 
  
 ### Dataset
+ * CelebA Face dataset 
+  * http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
+   * Download "img_align_celeba" images
+   * Set "face_image_path" in train.py according to the path of downloaded dataset
