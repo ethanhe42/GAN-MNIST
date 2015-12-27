@@ -16,3 +16,8 @@
   * http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
    * Download "img_align_celeba" images
    * Set "face_image_path" in train.py according to the path of downloaded dataset
+
+### MNIST Generation Results
+![alt tag](https://github.com/jazzsaxmafia/dcgan_tensorflow/blob/master/mnist/vis/sample_0.jpg)
+![alt tag](https://github.com/jazzsaxmafia/dcgan_tensorflow/blob/master/mnist/vis/sample_1.jpg)
+![alt tag](https://github.com/jazzsaxmafia/dcgan_tensorflow/blob/master/mnist/vis/sample_15.jpg)
