@@ -7,11 +7,13 @@
  * model.py
   * Definition of DCGAN model
  * train.py
-  * Training the DCGAN model using face data
+  * Training the DCGAN model (and Generating samples time to time)
  * util.py
   * Image related utils 
  
 ### Dataset
+ * MNIST
+  * http://yann.lecun.com/exdb/mnist/
  * CelebA Face dataset 
   * http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
    * Download "img_align_celeba" images
