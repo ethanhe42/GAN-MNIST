@@ -4,6 +4,7 @@
   * All the codes in this project are mere replication of [Theano version](https://github.com/Newmu/dcgan_code)
 
 ### Code
+ * Under face/ and mnist/
  * model.py
   * Definition of DCGAN model
  * train.py
