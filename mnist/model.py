@@ -6,7 +6,7 @@ def batchnormalize(X, eps=1e-8, g=None, b=None):
     if X.get_shape().ndims == 4:
         mean = tf.reduce_mean(X, [0,1,2])
         std = tf.reduce_mean( tf.square(X-mean), [0,1,2] )
-        X = (X-mean) / std
+        X = (X-mean) / tf.sqrt(std+eps)
 
         if g is not None and b is not None:
             g = tf.reshape(g, [1,1,1,-1])
@@ -16,7 +16,7 @@ def batchnormalize(X, eps=1e-8, g=None, b=None):
     elif X.get_shape().ndims == 2:
         mean = tf.reduce_mean(X, 0)
         std = tf.reduce_mean(tf.square(X-mean), 0)
-        X = (X-mean) / std
+        X = (X-mean) / tf.sqrt(std+eps)
 
         if g is not None and b is not None:
             g = tf.reshape(g, [1,-1])

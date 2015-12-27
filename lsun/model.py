@@ -60,39 +60,39 @@ class DCGAN():
         self.dim_W4 = dim_W4
         self.dim_W5 = dim_W5
 
-        self.gen_W1 = tf.Variable(tf.random_normal([dim_z, dim_W1*4*4], stddev=0.02), name='gen_W1')
-        self.gen_bn_g1 = tf.Variable( tf.random_normal([dim_W1*4*4], mean=1.0, stddev=0.02), name='gen_bn_g1')
+        self.gen_W1 = tf.Variable(tf.truncated_normal([dim_z, dim_W1*4*4], stddev=0.02), name='gen_W1')
+        self.gen_bn_g1 = tf.Variable( tf.truncated_normal([dim_W1*4*4], mean=1.0, stddev=0.02), name='gen_bn_g1')
         self.gen_bn_b1 = tf.Variable( tf.zeros([dim_W1*4*4]), name='gen_bn_b1')
 
-        self.gen_W2 = tf.Variable(tf.random_normal([5,5,dim_W2, dim_W1], stddev=0.02), name='gen_W2')
-        self.gen_bn_g2 = tf.Variable( tf.random_normal([dim_W2], mean=1.0, stddev=0.02), name='gen_bn_g2')
+        self.gen_W2 = tf.Variable(tf.truncated_normal([5,5,dim_W2, dim_W1], stddev=0.02), name='gen_W2')
+        self.gen_bn_g2 = tf.Variable( tf.truncated_normal([dim_W2], mean=1.0, stddev=0.02), name='gen_bn_g2')
         self.gen_bn_b2 = tf.Variable( tf.zeros([dim_W2]), name='gen_bn_b2')
 
-        self.gen_W3 = tf.Variable(tf.random_normal([5,5,dim_W3, dim_W2], stddev=0.02), name='gen_W3')
-        self.gen_bn_g3 = tf.Variable( tf.random_normal([dim_W3], mean=1.0, stddev=0.02), name='gen_bn_g3')
+        self.gen_W3 = tf.Variable(tf.truncated_normal([5,5,dim_W3, dim_W2], stddev=0.02), name='gen_W3')
+        self.gen_bn_g3 = tf.Variable( tf.truncated_normal([dim_W3], mean=1.0, stddev=0.02), name='gen_bn_g3')
         self.gen_bn_b3 = tf.Variable( tf.zeros([dim_W3]), name='gen_bn_b3')
 
-        self.gen_W4 = tf.Variable(tf.random_normal([5,5,dim_W4, dim_W3], stddev=0.02), name='gen_W4')
-        self.gen_bn_g4 = tf.Variable( tf.random_normal([dim_W4], mean=1.0, stddev=0.02), name='gen_bn_g4')
+        self.gen_W4 = tf.Variable(tf.truncated_normal([5,5,dim_W4, dim_W3], stddev=0.02), name='gen_W4')
+        self.gen_bn_g4 = tf.Variable( tf.truncated_normal([dim_W4], mean=1.0, stddev=0.02), name='gen_bn_g4')
         self.gen_bn_b4 = tf.Variable( tf.zeros([dim_W4]), name='gen_bn_b4')
 
-        self.gen_W5 = tf.Variable(tf.random_normal([5,5,dim_W5, dim_W4], stddev=0.02), name='gen_W5')
+        self.gen_W5 = tf.Variable(tf.truncated_normal([5,5,dim_W5, dim_W4], stddev=0.02), name='gen_W5')
 
-        self.discrim_W1 = tf.Variable(tf.random_normal([5,5,dim_W5,dim_W4], stddev=0.02), name='discrim_W1')
+        self.discrim_W1 = tf.Variable(tf.truncated_normal([5,5,dim_W5,dim_W4], stddev=0.02), name='discrim_W1')
 
-        self.discrim_W2 = tf.Variable(tf.random_normal([5,5,dim_W4,dim_W3], stddev=0.02), name='discrim_W2')
-        self.discrim_bn_g2 = tf.Variable( tf.random_normal([dim_W3], mean=1.0, stddev=0.02), name='discrim_bn_g2')
+        self.discrim_W2 = tf.Variable(tf.truncated_normal([5,5,dim_W4,dim_W3], stddev=0.02), name='discrim_W2')
+        self.discrim_bn_g2 = tf.Variable( tf.truncated_normal([dim_W3], mean=1.0, stddev=0.02), name='discrim_bn_g2')
         self.discrim_bn_b2 = tf.Variable( tf.zeros([dim_W3]), name='discrim_bn_b2')
 
-        self.discrim_W3 = tf.Variable(tf.random_normal([5,5,dim_W3,dim_W2], stddev=0.02), name='discrim_W3')
-        self.discrim_bn_g3 = tf.Variable( tf.random_normal([dim_W2], mean=1.0, stddev=0.02), name='discrim_bn_g3')
+        self.discrim_W3 = tf.Variable(tf.truncated_normal([5,5,dim_W3,dim_W2], stddev=0.02), name='discrim_W3')
+        self.discrim_bn_g3 = tf.Variable( tf.truncated_normal([dim_W2], mean=1.0, stddev=0.02), name='discrim_bn_g3')
         self.discrim_bn_b3 = tf.Variable( tf.zeros([dim_W2]), name='discrim_bn_b3')
 
-        self.discrim_W4 = tf.Variable(tf.random_normal([5,5,dim_W2,dim_W1], stddev=0.02), name='discrim_W4')
-        self.discrim_bn_g4 = tf.Variable( tf.random_normal([dim_W1], mean=1.0, stddev=0.02), name='discrim_bn_g4')
+        self.discrim_W4 = tf.Variable(tf.truncated_normal([5,5,dim_W2,dim_W1], stddev=0.02), name='discrim_W4')
+        self.discrim_bn_g4 = tf.Variable( tf.truncated_normal([dim_W1], mean=1.0, stddev=0.02), name='discrim_bn_g4')
         self.discrim_bn_b4 = tf.Variable( tf.zeros([dim_W1]), name='discrim_bn_b4')
 
-        self.discrim_W5 = tf.Variable(tf.random_normal([4*4*dim_W1,1], stddev=0.02), name='discrim_W5')
+        self.discrim_W5 = tf.Variable(tf.truncated_normal([4*4*dim_W1,1], stddev=0.02), name='discrim_W5')
 
         self.gen_params = [
                 self.gen_W1, self.gen_bn_g1, self.gen_bn_b1,
