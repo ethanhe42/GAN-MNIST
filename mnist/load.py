@@ -8,7 +8,7 @@ from collections import Counter
 import random
 from matplotlib import pyplot as plt
 
-data_dir = '/media/storage3/Study/data/mnist'
+data_dir = '/home/heyihui/shared/mnist'
 def mnist():
     fd = open(os.path.join(data_dir,'train-images-idx3-ubyte'))
     loaded = np.fromfile(file=fd,dtype=np.uint8)
@@ -34,7 +34,7 @@ def mnist():
 def mnist_with_valid_set():
     trX, teX, trY, teY = mnist()
 
-    train_inds = range(len(trX))
+    train_inds = np.arange(len(trX))
     np.random.shuffle(train_inds)
     trX = trX[train_inds]
     trY = trY[train_inds]

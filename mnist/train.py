@@ -35,6 +35,8 @@ saver = tf.train.Saver(max_to_keep=10)
 
 discrim_vars = filter(lambda x: x.name.startswith('discrim'), tf.trainable_variables())
 gen_vars = filter(lambda x: x.name.startswith('gen'), tf.trainable_variables())
+discrim_vars = [i for i in discrim_vars]
+gen_vars = [i for i in gen_vars]
 
 train_op_discrim = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(d_cost_tf, var_list=discrim_vars)
 train_op_gen = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(g_cost_tf, var_list=gen_vars)
@@ -49,7 +51,7 @@ iterations = 0
 k = 2
 
 for epoch in range(n_epochs):
-    index = range(len(trY))
+    index = np.arange(len(trY))
     np.random.shuffle(index)
     trX = trX[index]
     trY = trY[index]
@@ -71,10 +73,10 @@ for epoch in range(n_epochs):
                         Y_tf:Ys
                         })
             discrim_loss_val, p_real_val, p_gen_val = sess.run([d_cost_tf,p_real,p_gen], feed_dict={Z_tf:Zs, image_tf:Xs, Y_tf:Ys})
-            print "=========== updating G =========="
-            print "iteration:", iterations
-            print "gen loss:", gen_loss_val
-            print "discrim loss:", discrim_loss_val
+            print("=========== updating G ==========")
+            print("iteration:", iterations)
+            print("gen loss:", gen_loss_val)
+            print("discrim loss:", discrim_loss_val)
 
         else:
             _, discrim_loss_val = sess.run(
@@ -85,13 +87,13 @@ for epoch in range(n_epochs):
                         image_tf:Xs
                         })
             gen_loss_val, p_real_val, p_gen_val = sess.run([g_cost_tf, p_real, p_gen], feed_dict={Z_tf:Zs, image_tf:Xs, Y_tf:Ys})
-            print "=========== updating D =========="
-            print "iteration:", iterations
-            print "gen loss:", gen_loss_val
-            print "discrim loss:", discrim_loss_val
+            print("=========== updating D ==========")
+            print("iteration:", iterations)
+            print("gen loss:", gen_loss_val)
+            print("discrim loss:", discrim_loss_val)
 
-        print "Average P(real)=", p_real_val.mean()
-        print "Average P(gen)=", p_gen_val.mean()
+        print("Average P(real)=", p_real_val.mean())
+        print("Average P(gen)=", p_gen_val.mean())
 
         if np.mod(iterations, 200) == 0:
             generated_samples = sess.run(
@@ -101,7 +103,7 @@ for epoch in range(n_epochs):
                         Y_tf_sample:Y_np_sample
                         })
             generated_samples = (generated_samples + 1.)/2.
-            save_visualization(generated_samples, (14,14), save_path='./vis/sample_'+str(iterations/200)+'.jpg')
+            # save_visualization(generated_samples, (14,14), save_path='./vis/sample_'+str(iterations/200)+'.jpg')
 
         iterations += 1
 

@@ -70,10 +70,10 @@ for epoch in range(n_epochs):
                         Z_tf:batch_z,
                         })
             discrim_loss_val, p_real_val, p_gen_val, h_real_val, h_gen_val = sess.run([d_cost_tf,p_real,p_gen, h_real, h_gen], feed_dict={Z_tf:batch_z, image_tf:batch_images})
-            print "=========== updating G =========="
-            print "iteration:", iterations
-            print "gen loss:", gen_loss_val
-            print "discrim loss:", discrim_loss_val
+            print("=========== updating G ==========")
+            print("iteration:", iterations)
+            print("gen loss:", gen_loss_val)
+            print("discrim loss:", discrim_loss_val)
 
         else:
             _, discrim_loss_val = sess.run(
@@ -83,10 +83,10 @@ for epoch in range(n_epochs):
                         image_tf:batch_images
                         })
             gen_loss_val, p_real_val, p_gen_val, h_real_val, h_gen_val = sess.run([g_cost_tf, p_real, p_gen, h_real, h_gen], feed_dict={Z_tf:batch_z, image_tf:batch_images})
-            print "=========== updating D =========="
-            print "iteration:", iterations
-            print "gen loss:", gen_loss_val
-            print "discrim loss:", discrim_loss_val
+            print("=========== updating D ==========")
+            print("iteration:", iterations)
+            print("gen loss:", gen_loss_val)
+            print("discrim loss:", discrim_loss_val)
 
         ipdb.set_trace()
 

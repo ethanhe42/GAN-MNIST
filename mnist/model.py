@@ -35,7 +35,7 @@ def lrelu(X, leak=0.2):
 
 def bce(o, t):
     o = tf.clip_by_value(o, 1e-7, 1. - 1e-7)
-    return -(t * tf.log(o) + (1.- t)*tf.log(1. - o))
+    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(o, t))
 
 class DCGAN():
     def __init__(
@@ -76,16 +76,17 @@ class DCGAN():
         Y = tf.placeholder(tf.float32, [self.batch_size, self.dim_y])
 
         image_real = tf.placeholder(tf.float32, [self.batch_size]+self.image_shape)
-        image_gen = self.generate(Z,Y)
+        h4 = self.generate(Z,Y)
+        image_gen = tf.nn.sigmoid(h4)
+        raw_real = self.discriminate(image_real, Y)
+        p_real = tf.nn.sigmoid(raw_real)
+        raw_gen = self.discriminate(image_gen, Y)
+        p_gen = tf.nn.sigmoid(raw_gen)
+        discrim_cost_real = bce(raw_real, tf.ones_like(raw_real))
+        discrim_cost_gen = bce(raw_gen, tf.zeros_like(raw_gen))
+        discrim_cost = discrim_cost_real + discrim_cost_gen
 
-        p_real = self.discriminate(image_real, Y)
-        p_gen = self.discriminate(image_gen, Y)
-
-        discrim_cost_real = bce(p_real, tf.ones_like(p_real))
-        discrim_cost_gen = bce(p_gen, tf.zeros_like(p_gen))
-        discrim_cost = tf.reduce_mean(discrim_cost_real) + tf.reduce_mean(discrim_cost_gen)
-
-        gen_cost = tf.reduce_mean(bce( p_gen, tf.ones_like(p_gen) ))
+        gen_cost = bce( raw_gen, tf.ones_like(raw_gen) )
 
         return Z, Y, image_real, discrim_cost, gen_cost, p_real, p_gen
 
@@ -102,8 +103,7 @@ class DCGAN():
 
         h3 = lrelu( batchnormalize( tf.matmul(h2, self.discrim_W3 ) ))
         h3 = tf.concat(1, [h3, Y])
-        y = tf.nn.sigmoid(h3)
-        return y
+        return h3
 
     def generate(self, Z, Y):
 
@@ -116,14 +116,13 @@ class DCGAN():
         h2 = tf.concat( 3, [h2, yb*tf.ones([self.batch_size, 7, 7, self.dim_y])])
 
         output_shape_l3 = [self.batch_size,14,14,self.dim_W3]
-        h3 = tf.nn.deconv2d(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
+        h3 = tf.nn.conv2d_transpose(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
         h3 = tf.nn.relu( batchnormalize(h3) )
         h3 = tf.concat( 3, [h3, yb*tf.ones([self.batch_size, 14,14,self.dim_y])] )
 
         output_shape_l4 = [self.batch_size,28,28,self.dim_channel]
-        h4 = tf.nn.deconv2d(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
-        x = tf.nn.sigmoid(h4)
-        return x
+        h4 = tf.nn.conv2d_transpose(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
+        return h4
 
     def samples_generator(self, batch_size):
         Z = tf.placeholder(tf.float32, [batch_size, self.dim_z])
@@ -138,12 +137,12 @@ class DCGAN():
         h2 = tf.concat( 3, [h2, yb*tf.ones([batch_size, 7, 7, self.dim_y])])
 
         output_shape_l3 = [batch_size,14,14,self.dim_W3]
-        h3 = tf.nn.deconv2d(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
+        h3 = tf.nn.conv2d_transpose(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
         h3 = tf.nn.relu( batchnormalize(h3) )
         h3 = tf.concat( 3, [h3, yb*tf.ones([batch_size, 14,14,self.dim_y])] )
 
         output_shape_l4 = [batch_size,28,28,self.dim_channel]
-        h4 = tf.nn.deconv2d(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
+        h4 = tf.nn.conv2d_transpose(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
         x = tf.nn.sigmoid(h4)
         return Z,Y,x
 

@@ -19,23 +19,23 @@ def crop_resize(image_path, resize_shape=(64,64)):
     if width == height:
         resized_image = cv2.resize(image, resize_shape)
     elif width > height:
-        resized_image = cv2.resize(image, (int(width * float(resize_shape[0])/height), resize_shape[1]))
-        cropping_length = int( (resized_image.shape[1] - resize_shape[0]) / 2)
+        resized_image = cv2.resize(image, (int(width * float(resize_shape[0])//height), resize_shape[1]))
+        cropping_length = int( (resized_image.shape[1] - resize_shape[0]) // 2)
         resized_image = resized_image[:,cropping_length:cropping_length+resize_shape[1]]
     else:
         resized_image = cv2.resize(image, (resize_shape[0], int(height * float(resize_shape[1])/width)))
-        cropping_length = int( (resized_image.shape[0] - resize_shape[1]) / 2)
+        cropping_length = int( (resized_image.shape[0] - resize_shape[1]) // 2)
         resized_image = resized_image[cropping_length:cropping_length+resize_shape[0], :]
 
     return resized_image/127.5 - 1
 
-def save_visualization(X, (nh, nw), save_path='./vis/sample.jpg'):
+def save_visualization(X, nh_nw, save_path='./vis/sample.jpg'):
     h,w = X.shape[1], X.shape[2]
-    img = np.zeros((h * nh, w * nw, 3))
+    img = np.zeros((h * nh_nw[0], w * nh_nw[1], 3))
 
     for n,x in enumerate(X):
-        j = n / nw
-        i = n % nw
+        j = n // nh_nw[1]
+        i = n % nh_nw[1]
         img[j*h:j*h+h, i*w:i*w+w, :] = x
 
     scipy.misc.imsave(save_path, img)
