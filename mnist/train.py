@@ -103,7 +103,7 @@ for epoch in range(n_epochs):
                         Y_tf_sample:Y_np_sample
                         })
             generated_samples = (generated_samples + 1.)/2.
-            # save_visualization(generated_samples, (14,14), save_path='./vis/sample_'+str(iterations/200)+'.jpg')
+            save_visualization(generated_samples, (14,14), save_path='./vis/sample_'+str(iterations/200)+'.jpg')
 
         iterations += 1
 
