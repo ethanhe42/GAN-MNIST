@@ -143,19 +143,19 @@ class DCGAN():
         h1 = tf.reshape(h1, [self.batch_size,4,4,self.dim_W1])
 
         output_shape_l2 = [self.batch_size,8,8,self.dim_W2]
-        h2 = tf.nn.deconv2d(h1, self.gen_W2, output_shape=output_shape_l2, strides=[1,2,2,1])
+        h2 = tf.nn.conv2d_transpose(h1, self.gen_W2, output_shape=output_shape_l2, strides=[1,2,2,1])
         h2 = tf.nn.relu( batchnormalize(h2, g=self.gen_bn_g2, b=self.gen_bn_b2) )
 
         output_shape_l3 = [self.batch_size,16,16,self.dim_W3]
-        h3 = tf.nn.deconv2d(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
+        h3 = tf.nn.conv2d_transpose(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
         h3 = tf.nn.relu( batchnormalize(h3, g=self.gen_bn_g3, b=self.gen_bn_b3) )
 
         output_shape_l4 = [self.batch_size,32,32,self.dim_W4]
-        h4 = tf.nn.deconv2d(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
+        h4 = tf.nn.conv2d_transpose(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
         h4 = tf.nn.relu( batchnormalize(h4, g=self.gen_bn_g4, b=self.gen_bn_b4) )
 
         output_shape_l5 = [self.batch_size,64,64,self.dim_W5]
-        h5 = tf.nn.deconv2d(h4, self.gen_W5, output_shape=output_shape_l5, strides=[1,2,2,1])
+        h5 = tf.nn.conv2d_transpose(h4, self.gen_W5, output_shape=output_shape_l5, strides=[1,2,2,1])
 
         x = tf.nn.tanh(h5)
         return x
@@ -167,19 +167,19 @@ class DCGAN():
         h1 = tf.reshape(h1, [batch_size,4,4,self.dim_W1])
 
         output_shape_l2 = [batch_size,8,8,self.dim_W2]
-        h2 = tf.nn.deconv2d(h1, self.gen_W2, output_shape=output_shape_l2, strides=[1,2,2,1])
+        h2 = tf.nn.conv2d_transpose(h1, self.gen_W2, output_shape=output_shape_l2, strides=[1,2,2,1])
         h2 = tf.nn.relu( batchnormalize(h2) )
 
         output_shape_l3 = [batch_size,16,16,self.dim_W3]
-        h3 = tf.nn.deconv2d(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
+        h3 = tf.nn.conv2d_transpose(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
         h3 = tf.nn.relu( batchnormalize(h3) )
 
         output_shape_l4 = [batch_size,32,32,self.dim_W4]
-        h4 = tf.nn.deconv2d(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
+        h4 = tf.nn.conv2d_transpose(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
         h4 = tf.nn.relu( batchnormalize(h4) )
 
         output_shape_l5 = [batch_size,64,64,self.dim_W5]
-        h5 = tf.nn.deconv2d(h4, self.gen_W5, output_shape=output_shape_l5, strides=[1,2,2,1])
+        h5 = tf.nn.conv2d_transpose(h4, self.gen_W5, output_shape=output_shape_l5, strides=[1,2,2,1])
 
         x = tf.nn.tanh(h5)
         return Z, x
