@@ -1,6 +1,5 @@
 #-*- coding: utf-8 -*-
 import tensorflow as tf
-import ipdb
 
 def batchnormalize(X, eps=1e-8, g=None, b=None):
     if X.get_shape().ndims == 4:
@@ -35,7 +34,7 @@ def lrelu(X, leak=0.2):
 
 def bce(o, t):
     o = tf.clip_by_value(o, 1e-7, 1. - 1e-7)
-    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(o, t))
+    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=o, labels=t))
 
 class DCGAN():
     def __init__(
@@ -77,7 +76,7 @@ class DCGAN():
 
         image_real = tf.placeholder(tf.float32, [self.batch_size]+self.image_shape)
         h4 = self.generate(Z,Y)
-        image_gen = tf.nn.sigmoid(h4)
+        image_gen = tf.nn.sigmoid(h4)   #激活函数
         raw_real = self.discriminate(image_real, Y)
         p_real = tf.nn.sigmoid(raw_real)
         raw_gen = self.discriminate(image_gen, Y)
@@ -91,34 +90,34 @@ class DCGAN():
         return Z, Y, image_real, discrim_cost, gen_cost, p_real, p_gen
 
     def discriminate(self, image, Y):
-        yb = tf.reshape(Y, tf.pack([self.batch_size, 1, 1, self.dim_y]))
-        X = tf.concat(3, [image, yb*tf.ones([self.batch_size, 28, 28, self.dim_y])])
+        yb = tf.reshape(Y, tf.stack([self.batch_size, 1, 1, self.dim_y]))
+        X = tf.concat(axis=3, values=[image, yb*tf.ones([self.batch_size, 28, 28, self.dim_y])])
 
         h1 = lrelu( tf.nn.conv2d( X, self.discrim_W1, strides=[1,2,2,1], padding='SAME' ))
-        h1 = tf.concat(3, [h1, yb*tf.ones([self.batch_size, 14, 14, self.dim_y])])
+        h1 = tf.concat(axis=3, values=[h1, yb*tf.ones([self.batch_size, 14, 14, self.dim_y])])
 
         h2 = lrelu( batchnormalize( tf.nn.conv2d( h1, self.discrim_W2, strides=[1,2,2,1], padding='SAME')) )
         h2 = tf.reshape(h2, [self.batch_size, -1])
-        h2 = tf.concat(1, [h2, Y])
+        h2 = tf.concat(axis=1, values=[h2, Y])
 
         h3 = lrelu( batchnormalize( tf.matmul(h2, self.discrim_W3 ) ))
-        h3 = tf.concat(1, [h3, Y])
+        h3 = tf.concat(axis=1, values=[h3, Y])
         return h3
 
     def generate(self, Z, Y):
 
         yb = tf.reshape(Y, [self.batch_size, 1, 1, self.dim_y])
-        Z = tf.concat(1, [Z,Y])
+        Z = tf.concat(axis=1, values=[Z,Y])
         h1 = tf.nn.relu(batchnormalize(tf.matmul(Z, self.gen_W1)))
-        h1 = tf.concat(1, [h1, Y])
+        h1 = tf.concat(axis=1, values=[h1, Y])
         h2 = tf.nn.relu(batchnormalize(tf.matmul(h1, self.gen_W2)))
         h2 = tf.reshape(h2, [self.batch_size,7,7,self.dim_W2])
-        h2 = tf.concat( 3, [h2, yb*tf.ones([self.batch_size, 7, 7, self.dim_y])])
+        h2 = tf.concat(axis=3, values=[h2, yb*tf.ones([self.batch_size, 7, 7, self.dim_y])])
 
         output_shape_l3 = [self.batch_size,14,14,self.dim_W3]
         h3 = tf.nn.conv2d_transpose(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
         h3 = tf.nn.relu( batchnormalize(h3) )
-        h3 = tf.concat( 3, [h3, yb*tf.ones([self.batch_size, 14,14,self.dim_y])] )
+        h3 = tf.concat(axis=3, values=[h3, yb*tf.ones([self.batch_size, 14,14,self.dim_y])] )
 
         output_shape_l4 = [self.batch_size,28,28,self.dim_channel]
         h4 = tf.nn.conv2d_transpose(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])
@@ -129,17 +128,17 @@ class DCGAN():
         Y = tf.placeholder(tf.float32, [batch_size, self.dim_y])
 
         yb = tf.reshape(Y, [batch_size, 1, 1, self.dim_y])
-        Z_ = tf.concat(1, [Z,Y])
+        Z_ = tf.concat(axis=1, values=[Z,Y])
         h1 = tf.nn.relu(batchnormalize(tf.matmul(Z_, self.gen_W1)))
-        h1 = tf.concat(1, [h1, Y])
+        h1 = tf.concat(axis=1, values=[h1, Y])
         h2 = tf.nn.relu(batchnormalize(tf.matmul(h1, self.gen_W2)))
         h2 = tf.reshape(h2, [batch_size,7,7,self.dim_W2])
-        h2 = tf.concat( 3, [h2, yb*tf.ones([batch_size, 7, 7, self.dim_y])])
+        h2 = tf.concat(axis=3, values=[h2, yb*tf.ones([batch_size, 7, 7, self.dim_y])])
 
         output_shape_l3 = [batch_size,14,14,self.dim_W3]
         h3 = tf.nn.conv2d_transpose(h2, self.gen_W3, output_shape=output_shape_l3, strides=[1,2,2,1])
         h3 = tf.nn.relu( batchnormalize(h3) )
-        h3 = tf.concat( 3, [h3, yb*tf.ones([batch_size, 14,14,self.dim_y])] )
+        h3 = tf.concat(axis=3, values=[h3, yb*tf.ones([batch_size, 14,14,self.dim_y])] )
 
         output_shape_l4 = [batch_size,28,28,self.dim_channel]
         h4 = tf.nn.conv2d_transpose(h3, self.gen_W4, output_shape=output_shape_l4, strides=[1,2,2,1])

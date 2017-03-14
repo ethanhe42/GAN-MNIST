@@ -3,12 +3,8 @@ sys.path.append('..')
 
 import numpy as np
 import os
-from time import time
-from collections import Counter
-import random
-from matplotlib import pyplot as plt
 
-data_dir = '/home/heyihui/shared/mnist'
+data_dir = 'data/'
 def mnist():
     fd = open(os.path.join(data_dir,'train-images-idx3-ubyte'))
     loaded = np.fromfile(file=fd,dtype=np.uint8)
