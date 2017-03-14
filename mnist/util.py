@@ -1,6 +1,5 @@
 import cv2
 import scipy.misc
-import ipdb
 import numpy as np
 
 def OneHot(X, n=None, negative_class=0.):
@@ -39,3 +38,4 @@ def save_visualization(X, nh_nw, save_path='./vis/sample.jpg'):
         img[j*h:j*h+h, i*w:i*w+w, :] = x
 
     scipy.misc.imsave(save_path, img)
+
