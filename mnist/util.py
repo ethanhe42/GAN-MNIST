@@ -1,6 +1,5 @@
 import cv2
 import scipy.misc
-import ipdb
 import numpy as np
 
 def OneHot(X, n=None, negative_class=0.):
