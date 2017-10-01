@@ -102,7 +102,10 @@ class DCGAN():
 
         h3 = lrelu( batchnormalize( tf.matmul(h2, self.discrim_W3 ) ))
         h3 = tf.concat(axis=1, values=[h3, Y])
-        return h3
+        
+        h4 = lrelu(batchnormalize(tf.matmul(h3,self.discrim_W4)))
+        
+        return h4
 
     def generate(self, Z, Y):
 
