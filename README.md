@@ -23,3 +23,6 @@ architecture | results
   * http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
    * Download "img_align_celeba" images
    * Set "face_image_path" in train.py according to the path of downloaded dataset
+
+### references
+https://github.com/carpedm20/DCGAN-tensorflow
