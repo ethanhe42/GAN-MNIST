@@ -1,6 +1,6 @@
 # Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks
 
-![gan](https://github.com/carpedm20/DCGAN-tensorflow/blob/master/DCGAN.png) | ![alt tag](https://github.com/jazzsaxmafia/dcgan_tensorflow/blob/master/mnist/vis/sample_15.jpg)
+![gan](https://raw.githubusercontent.com/carpedm20/DCGAN-tensorflow/master/DCGAN.png) | ![alt tag](https://raw.githubusercontent.com/jazzsaxmafia/dcgan_tensorflow/master/mnist/vis/sample_15.jpg)
 ---|---
 architecture | results
 
