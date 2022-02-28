@@ -1,1 +1,1 @@
-# https://yihui-he.github.io/GAN-MNIST/
+https://yihui-he.github.io/blog/gan-on-mnist-with-tensorflow
